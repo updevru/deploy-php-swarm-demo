@@ -16,6 +16,5 @@ services:
     links:
       - api
     volumes:
-      - ./:/var/www
       - ./docker/nginx/conf.d/default.conf:/etc/nginx/conf.d/default.conf
       - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf

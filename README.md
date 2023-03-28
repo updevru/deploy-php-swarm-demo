@@ -18,7 +18,9 @@ docker run -it --rm -v $(pwd):/app -w /app -u $(id -u ${USER}):$(id -g ${USER}) 
 composer create-project symfony/skeleton:"6.3.*@dev" api
 ```
 
-Создаем [Dockerfile](api/Dockerfile), [docker-compose.yml](docker-compose.yml) и необходимые конфиги для nginx.
+## DEV окружение
+
+Создаем [Dockerfile](api/Dockerfile), [docker-compose.yml](docker-compose.yml) и необходимые конфиги для [nginx](docker/nginx).
 
 Добавляем права на запуск `entrypoint.sh` и запускаем наше приложение.
 
@@ -30,3 +32,23 @@ docker compose up
 
 Заходим на http://localhost:4000/ и видим приветственную страничка Symfony. В консоле можем наблюдать лог приложения и nginx.
 
+В дальнейшем для запуска dev окружения достаточно выполнить `docker compose up` и можно начинать разрабатывать.
+
+## Сборка приложения
+
+Для запуска приложения на других контурах необходимо его собрать и тем самым заффиксировать его состояние.
+
+Сборка любого приложения в Docker состоит из следующих шагов:
+
+1) Создание образа
+2) Публикация образа в registry
+
+В ручном режиме достаточно выполнить:
+
+```bash
+cd api/
+docker build -t updev/example-web-app-api
+docker push updev/example-web-app-api
+```
+
+Обычно этот процесс автоматизирует с помощью CI/CD систем. Пример для [github action](.github/workflows).
