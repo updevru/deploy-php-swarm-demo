@@ -1,0 +1,50 @@
+version: "3.9"
+services:
+  api:
+    image: updev/example-web-app-api:v1
+    restart: always
+    networks:
+      - overlay
+    environment:
+      APP_ENV: prod
+    deploy:
+      mode: replicated
+      replicas: 2
+      update_config:
+        parallelism: 2
+        delay: 15s
+        order: start-first
+        failure_action: rollback
+      restart_policy:
+        condition: on-failure
+        delay: 15s
+
+  nginx:
+    image: updev/example-web-app-nginx:v1
+    networks:
+      - overlay
+    labels:
+      traefik.http.routers.nginx.rule: "Host(`example-swarm.updev.ru`)"
+      traefik.http.services.nginx.loadbalancer.server.port: 80
+      traefik.http.routers.nginx.entrypoints: secure
+      traefik.http.routers.nginx.tls.certresolver: default
+    depends_on:
+      - api
+    links:
+      - api
+    deploy:
+      mode: replicated
+      replicas: 2
+      update_config:
+        parallelism: 2
+        delay: 15s
+        order: start-first
+        failure_action: rollback
+      restart_policy:
+        condition: on-failure
+        delay: 15s
+
+networks:
+  overlay:
+    external:
+      name: cluster-network

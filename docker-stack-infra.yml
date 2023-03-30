@@ -1,0 +1,27 @@
+version: "3.9"
+services:
+  proxy:
+    image: traefik:v2.9
+    restart: always
+    networks:
+      - overlay
+    ports:
+      - "80:80"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - proxy-acme:/acme.json
+    command: --providers.docker --certificatesresolvers.default.acme.email=sladygin@updev.ru --certificatesresolvers.default.acme.storage=acme.json
+    deploy:
+      mode: global
+      update_config:
+        parallelism: 2
+        delay: 15s
+        order: start-first
+
+networks:
+  overlay:
+    external:
+      name: cluster-network
+
+volumes:
+  proxy-acme:
